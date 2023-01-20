@@ -1,6 +1,7 @@
 from rest_framework import generics
 from .models import Book, MenuItem, Category
 from .serializers import BookSerializer, MenuItemSerializer, CategorySerializer
+from .pagination import SmallResultsSetPagination
 
 
 class BookView(generics.ListCreateAPIView):
@@ -19,6 +20,7 @@ class MenuItemsView(generics.ListCreateAPIView):
     ordering_fields = ['price', 'inventory']
     filterset_fields = ['price', 'inventory']
     search_fields = ['title']
+    pagination_class = SmallResultsSetPagination
 
 
 class SingleMenuItemView(generics.RetrieveUpdateDestroyAPIView):
