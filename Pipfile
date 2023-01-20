@@ -9,6 +9,7 @@ djangorestframework = "*"
 markdown = "*"
 django-filter = "*"
 djangorestframework-xml = "*"
+bleach = "*"
 
 [dev-packages]
 
