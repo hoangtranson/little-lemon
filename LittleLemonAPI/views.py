@@ -1,4 +1,7 @@
 from rest_framework import generics
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from .models import Book, MenuItem, Category
 from .serializers import BookSerializer, MenuItemSerializer, CategorySerializer
 from .pagination import SmallResultsSetPagination
@@ -31,3 +34,9 @@ class SingleMenuItemView(generics.RetrieveUpdateDestroyAPIView):
 class CategoriesView(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
+
+@api_view()
+@permission_classes([IsAuthenticated])
+def secret(request):
+    return Response({'test secret'})

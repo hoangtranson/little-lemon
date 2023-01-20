@@ -7,6 +7,12 @@
 - Create app `django-admin startapp LittleLemonAPI`
 - python .\manage.py runserver
 
+## Create Super User
+
+```
+python3 manage.py createsuperuser
+```
+
 ## Installing and setting up DRF
 
 - `pipenv install djangorestframework`
