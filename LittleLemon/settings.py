@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'LittleLemonAPI',
+    'djoser'
 ]
 
 MIDDLEWARE = [
@@ -153,4 +154,8 @@ REST_FRAMEWORK = {
         'anon': '2/min',
         'user': '2/min'
     }
+}
+
+DJOSER = {
+    'USER_ID_FIELD': 'username'
 }

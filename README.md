@@ -16,6 +16,8 @@ python3 manage.py createsuperuser
 ## Installing and setting up DRF
 
 - `pipenv install djangorestframework`
+- `pipenv install djangorestframework-xml`
+- `pipenv install djoser`
 
 ## User Test
 
