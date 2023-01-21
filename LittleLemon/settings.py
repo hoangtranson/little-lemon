@@ -161,3 +161,8 @@ REST_FRAMEWORK = {
 DJOSER = {
     'USER_ID_FIELD': 'username'
 }
+
+
+# SIMPLE_JWT = {
+#     "ACCESS_TOKEN_LIFETIME": timedelta(minute=5)
+# }
