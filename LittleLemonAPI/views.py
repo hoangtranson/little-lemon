@@ -6,8 +6,8 @@ from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User, Group
 
-from .models import Book, MenuItem, Category
-from .serializers import BookSerializer, MenuItemSerializer, CategorySerializer
+from .models import Book, MenuItem, Category, Rating
+from .serializers import BookSerializer, MenuItemSerializer, CategorySerializer, RatingSerializer
 from .pagination import SmallResultsSetPagination
 
 
@@ -90,3 +90,14 @@ def manager_permission(request):
 
         return Response({'message': 'ok'})
     return Response({'message': 'error'}, status.HTTP_400_BAD_REQUEST)
+
+
+class RatingsView(generics.ListCreateAPIView):
+    queryset = Rating.objects.all()
+    serializer_class = RatingSerializer
+
+    def get_permissions(self):
+        if (self.request.method == 'GET'):
+            return []
+
+        return [IsAuthenticated()]
