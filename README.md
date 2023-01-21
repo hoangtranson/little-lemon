@@ -18,6 +18,7 @@ python3 manage.py createsuperuser
 - `pipenv install djangorestframework`
 - `pipenv install djangorestframework-xml`
 - `pipenv install djoser`
+- `pipenv install djangorestframework_simplejwt`
 
 ## User Test
 

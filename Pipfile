@@ -11,6 +11,7 @@ django-filter = "*"
 djangorestframework-xml = "*"
 bleach = "*"
 djoser = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 
