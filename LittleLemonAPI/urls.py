@@ -14,4 +14,5 @@ urlpatterns = [
     path('manager-view', views.manager_view),
     path('guess-throttle', views.throttle_check_anon),
     path('user-throttle', views.throttle_check_user),
+    path('group/manager/users', views.manager_permission),
 ]

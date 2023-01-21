@@ -1,8 +1,11 @@
-from rest_framework import generics
+from rest_framework import generics, status
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
+from django.shortcuts import get_object_or_404
+from django.contrib.auth.models import User, Group
+
 from .models import Book, MenuItem, Category
 from .serializers import BookSerializer, MenuItemSerializer, CategorySerializer
 from .pagination import SmallResultsSetPagination
@@ -69,3 +72,21 @@ def throttle_check_anon(request):
 @throttle_classes([UserRateThrottle])
 def throttle_check_user(request):
     return Response({'test throttle login user'})
+
+
+@api_view(['POST', 'DELETE'])
+@permission_classes([IsAdminUser])
+def manager_permission(request):
+    username = request.data['username']
+
+    if username:
+        user = get_object_or_404(User, username=username)
+        managers = Group.objects.get(name='Manager')
+
+        if request.method == 'POST':
+            managers.user_set.add(user)
+        elif request.method == 'DELETE':
+            managers.user_set.remove(user)
+
+        return Response({'message': 'ok'})
+    return Response({'message': 'error'}, status.HTTP_400_BAD_REQUEST)
