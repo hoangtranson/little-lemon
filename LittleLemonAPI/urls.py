@@ -12,4 +12,6 @@ urlpatterns = [
     path('api-token-auth', obtain_auth_token),
     path('me', views.me),
     path('manager-view', views.manager_view),
+    path('guess-throttle', views.throttle_check_anon),
+    path('user-throttle', views.throttle_check_user),
 ]

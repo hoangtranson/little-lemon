@@ -1,7 +1,8 @@
 from rest_framework import generics
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 from .models import Book, MenuItem, Category
 from .serializers import BookSerializer, MenuItemSerializer, CategorySerializer
 from .pagination import SmallResultsSetPagination
@@ -55,3 +56,16 @@ def manager_view(request):
         return Response({'manager view only'})
     else:
         return Response({'not allow'}, 403)
+
+
+@api_view()
+@throttle_classes([AnonRateThrottle])
+def throttle_check_anon(request):
+    return Response({'test throttle not login user'})
+
+
+@api_view()
+@permission_classes([IsAuthenticated])
+@throttle_classes([UserRateThrottle])
+def throttle_check_user(request):
+    return Response({'test throttle login user'})
