@@ -40,3 +40,18 @@ class CategoriesView(generics.ListCreateAPIView):
 @permission_classes([IsAuthenticated])
 def secret(request):
     return Response({'test secret'})
+
+
+@api_view()
+@permission_classes([IsAuthenticated])
+def me(request):
+    return Response(request.user.email)
+
+
+@api_view()
+@permission_classes([IsAuthenticated])
+def manager_view(request):
+    if (request.user.groups.filter(name='Manager').exists()):
+        return Response({'manager view only'})
+    else:
+        return Response({'not allow'}, 403)

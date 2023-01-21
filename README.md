@@ -16,3 +16,7 @@ python3 manage.py createsuperuser
 ## Installing and setting up DRF
 
 - `pipenv install djangorestframework`
+
+## User Test
+
+Password: year2023!

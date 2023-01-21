@@ -10,4 +10,6 @@ urlpatterns = [
     path('categories', views.CategoriesView.as_view()),
     path('secret', views.secret),
     path('api-token-auth', obtain_auth_token),
+    path('me', views.me),
+    path('manager-view', views.manager_view),
 ]
