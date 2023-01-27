@@ -55,7 +55,7 @@ def me(request):
 @api_view()
 @permission_classes([IsAuthenticated])
 def manager_view(request):
-    if (request.user.groups.filter(name='Manager').exists()):
+    if request.user.groups.filter(name='Manager').exists():
         return Response({'manager view only'})
     else:
         return Response({'not allow'}, 403)
