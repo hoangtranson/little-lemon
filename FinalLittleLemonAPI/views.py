@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-from rest_framework import status, generics
+from rest_framework import status, generics, filters
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
@@ -93,11 +93,26 @@ class CategoriesView(generics.ListCreateAPIView):
 # 17.	Customers can sort menu items by price
 class MenuItemView(generics.ListCreateAPIView):
     permission_classes = [LittleLemonPermission]
-    queryset = MenuItem.objects.select_related('category').all()
     serializer_class = MenuItemSerializer
     ordering_fields = ['price']
-    filterset_fields = ['category']
 
+    param_check_list = ['category']
+
+    def get_queryset(self):
+        queryset = MenuItem.objects.all()
+
+        params = self.check_for_params()
+        filtered = {k: v for k, v in params.items() if v}
+        return queryset.filter(**filtered)
+
+    def check_for_params(self) -> dict:
+        if not self.param_check_list:
+            return {}
+        else:
+            param_dict = {}
+            for p in self.param_check_list:
+                param_dict[p] = self.request.query_params.get(p, None)
+            return param_dict
 
 # 18.	Customers can add menu items to the cart
 def add_menu_item_to_cart(request):
