@@ -35,3 +35,70 @@ class MenuItemSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'price': {'min_value': 2},
         }
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    order_by = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        default=serializers.CurrentUserDefault()
+    )
+    delivery_crew = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        default=serializers.CurrentUserDefault()
+    )
+
+    class Meta:
+        model = Order
+        fields = ['order_by', 'delivery_crew', 'status', 'total', 'date']
+
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    order = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        default=serializers.CurrentUserDefault()
+    )
+
+    menuitem = serializers.PrimaryKeyRelatedField(
+        queryset=MenuItem.objects.all()
+    )
+
+    class Meta:
+        model = OrderItem
+        fields = ['order', 'menuitem', 'quantity', 'unit_price', 'price']
+        extra_kwargs = {
+            'quantity': {'min_value': 1},
+            'unit_price': {'min_value': 2},
+            'price': {'min_value': 2},
+        }
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=OrderItem.objects.all(),
+                fields=['order', 'menuitem']
+            ),
+        ]
+
+
+class CartSerializer(serializers.ModelSerializer):
+    # user = serializers.PrimaryKeyRelatedField(
+    #     queryset=User.objects.all(),
+    #     default=serializers.CurrentUserDefault()
+    # )
+    user = UserSerializer(read_only=True)
+    menuitem = MenuItemSerializer(read_only=True)
+
+    class Meta:
+        model = Cart
+        fields = ['user', 'menuitem', 'quantity', 'unit_price', 'price']
+        extra_kwargs = {
+            'quantity': {'min_value': 1},
+            'unit_price': {'min_value': 2},
+            'price': {'min_value': 2},
+        }
+
+        validators = [
+            UniqueTogetherValidator(
+                queryset=Cart.objects.all(),
+                fields=['user', 'menuitem']
+            ),
+        ]
