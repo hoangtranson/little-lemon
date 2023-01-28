@@ -1,12 +1,13 @@
 from django.http import JsonResponse
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.models import User, Group
-from .serializers import UserSerializer
+from .models import Category, MenuItem, Cart, Order, OrderItem
+from .serializers import UserSerializer, CategorySerializer, MenuItemSerializer
 
 
 class LittleLemonPermission(IsAdminUser):
@@ -39,16 +40,6 @@ def manager_user(request):
         return JsonResponse({"message": "Username not found"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
         return Response('test manager user')
-
-
-# 3.	The admin can add menu items
-def add_menu_item(request):
-    return Response('add_menu_item')
-
-
-# 4.	The admin can add categories
-def add_menu_category(request):
-    return Response('add_menu_category')
 
 
 # 5.	Managers can log in
@@ -87,17 +78,25 @@ def register_customer(request):
     return Response('register_customer')
 
 
+# 4.	The admin can add categories
 # 13.	Customers can browse all categories
-def get_categories(request):
-    return Response('get_categories')
+class CategoriesView(generics.ListCreateAPIView):
+    permission_classes = [LittleLemonPermission]
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
 
 
+# 3.	The admin can add menu items
 # 14.	Customers can browse all the menu items at once
 # 15.	Customers can browse menu items by category
 # 16.	Customers can paginate menu items
 # 17.	Customers can sort menu items by price
-def get_menu_items(request):
-    return Response('get_menu_items')
+class MenuItemView(generics.ListCreateAPIView):
+    permission_classes = [LittleLemonPermission]
+    queryset = MenuItem.objects.select_related('category').all()
+    serializer_class = MenuItemSerializer
+    ordering_fields = ['price']
+    filterset_fields = ['category']
 
 
 # 18.	Customers can add menu items to the cart
