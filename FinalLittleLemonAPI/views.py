@@ -29,7 +29,7 @@ def manager_user(request):
     if request.method == 'GET':
         managers = User.objects.filter(groups=1)
         serializer = UserSerializer(managers, many=True)
-        return JsonResponse(serializer.data, safe=False)
+        return Response(serializer.data, status.HTTP_200_OK)
     elif request.method == 'POST':
         username = request.data['username']
 
@@ -38,7 +38,7 @@ def manager_user(request):
             user = get_object_or_404(User, username=username)
             manager_role.user_set.add(user)
             return Response({"message": "User assigned to manager group"}, status.HTTP_201_CREATED)
-        return JsonResponse({"message": "Username not found"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({"message": "Username not found"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
     else:
         return Response('test manager user')
 
@@ -65,22 +65,40 @@ def update_item(request, pk):
             if serializer.is_valid():
                 serializer.save()
                 return Response({"message": "Successfully updated item of the day!"}, status.HTTP_200_OK)
-            return Response('update_item')
+            return Response({"message": "Data not valid"}, status.HTTP_400_BAD_REQUEST)
 
     except ObjectDoesNotExist:
         return Response({"message": "Data not existing"}, status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return JsonResponse(e, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-
-# 7.	Managers can assign users to the delivery crew
-def assign_user_to_delivery_crew(request):
-    return Response('assign_user_to_delivery_crew')
+        return Response(e, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # 8.	Managers can assign orders to the delivery crew
 def assign_order_to_delivery_crew(request):
     return Response('assign_order_to_delivery_crew')
+
+
+# 7.	Managers can assign users to the delivery crew
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def delivery_crew(request):
+    try:
+        if request.method == 'GET':
+            managers = User.objects.filter(groups=2)
+            serializer = UserSerializer(managers, many=True)
+            return Response(serializer.data, status.HTTP_200_OK)
+        elif request.method == 'POST':
+            username = request.data['username']
+
+            if username:
+                delivery_role = Group.objects.get(name="Delivery Crew")
+                user = get_object_or_404(User, username=username)
+                delivery_role.user_set.add(user)
+                return Response({"message": "User assigned to Delivery Crew group"}, status.HTTP_201_CREATED)
+
+        return Response({"message": "Username not found"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        return Response(e, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # 9.	The delivery crew can access orders assigned to them
