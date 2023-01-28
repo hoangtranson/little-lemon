@@ -1,7 +1,20 @@
-from django.shortcuts import render
+from django.http import JsonResponse
+from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+
+from django.contrib.auth.models import User, Group
+from .serializers import UserSerializer
+
+
+class LittleLemonPermission(IsAdminUser):
+    def has_permission(self, request, view):
+        if request.method == 'GET':
+            return True
+        else:
+            return super().has_permission(request, view)
 
 
 # Create your views here.
@@ -9,9 +22,23 @@ from rest_framework.response import Response
 # 1.	The admin can assign users to the manager group
 # 2.	You can access the manager group with an admin token
 @api_view(['GET', 'POST'])
-@permission_classes([IsAdminUser])
+@permission_classes([LittleLemonPermission])
 def manager_user(request):
-    return Response('assign_user_to_manager')
+    if request.method == 'GET':
+        managers = User.objects.filter(groups=1)
+        serializer = UserSerializer(managers, many=True)
+        return JsonResponse(serializer.data, safe=False)
+    elif request.method == 'POST':
+        username = request.data['username']
+
+        if username:
+            manager_role = Group.objects.get(name="Manager")
+            user = get_object_or_404(User, username=username)
+            manager_role.user_set.add(user)
+            return Response({"message": "User assigned to manager group"}, status.HTTP_201_CREATED)
+        return JsonResponse({"message": "Username not found"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+    else:
+        return Response('test manager user')
 
 
 # 3.	The admin can add menu items
