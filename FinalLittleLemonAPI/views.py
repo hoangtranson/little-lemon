@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from rest_framework import status, generics, filters
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAdminUser
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
@@ -47,8 +47,16 @@ def manager_user(request):
 #  DONE using djoser
 
 # 6.	Managers can update the item of the day
-def update_item(request):
-    return Response('update_item')
+@api_view(['GET', 'PATCH', 'PUT'])
+@permission_classes([IsAuthenticated])
+def update_item(request, pk):
+    if request.method == 'GET':
+        item = MenuItem.objects.get(pk=pk)
+        serializer = MenuItemSerializer(item).data
+
+        return JsonResponse(serializer, safe=False)
+    else:
+        return Response('update_item')
 
 
 # 7.	Managers can assign users to the delivery crew
