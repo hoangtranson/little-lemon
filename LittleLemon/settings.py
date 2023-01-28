@@ -160,8 +160,13 @@ REST_FRAMEWORK = {
 }
 
 DJOSER = {
-    'USER_ID_FIELD': 'username'
+    'USER_ID_FIELD': 'username',
+    'SERIALIZERS': {
+        'current_user': 'FinalLittleLemonAPI.serializers.UserSerializer',
+        'user': 'FinalLittleLemonAPI.serializers.UserSerializer',
+    }
 }
+
 
 
 # SIMPLE_JWT = {

@@ -44,9 +44,7 @@ def manager_user(request):
 
 # 5.	Managers can log in
 # 12.	Customers can log in using their username and password and get access tokens
-def login(request):
-    return Response('login')
-
+#  DONE using djoser
 
 # 6.	Managers can update the item of the day
 def update_item(request):
