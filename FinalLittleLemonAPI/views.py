@@ -1,3 +1,4 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse
 from rest_framework import status, generics, filters
 from rest_framework.decorators import api_view, permission_classes
@@ -50,13 +51,26 @@ def manager_user(request):
 @api_view(['GET', 'PATCH', 'PUT'])
 @permission_classes([IsAuthenticated])
 def update_item(request, pk):
-    if request.method == 'GET':
+    try:
         item = MenuItem.objects.get(pk=pk)
-        serializer = MenuItemSerializer(item).data
 
-        return JsonResponse(serializer, safe=False)
-    else:
-        return Response('update_item')
+        if request.method == 'GET':
+
+            serializer = MenuItemSerializer(item).data
+            return JsonResponse(serializer, safe=False)
+
+        elif request.user.groups.filter(name='Manager').exists():
+
+            serializer = MenuItemSerializer(item, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "Successfully updated item of the day!"}, status.HTTP_200_OK)
+            return Response('update_item')
+
+    except ObjectDoesNotExist:
+        return Response({"message": "Data not existing"}, status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return JsonResponse(e, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # 7.	Managers can assign users to the delivery crew
@@ -119,6 +133,7 @@ class MenuItemView(generics.ListCreateAPIView):
             for p in self.param_check_list:
                 param_dict[p] = self.request.query_params.get(p, None)
             return param_dict
+
 
 # 18.	Customers can add menu items to the cart
 def add_menu_item_to_cart(request):
