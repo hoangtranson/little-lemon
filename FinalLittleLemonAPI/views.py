@@ -8,7 +8,9 @@ from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.models import User, Group
 from .models import Category, MenuItem, Cart, Order, OrderItem
-from .serializers import UserSerializer, CategorySerializer, MenuItemSerializer, OrderSerializer, CartSerializer
+from .serializers import UserSerializer, CategorySerializer, MenuItemSerializer, OrderSerializer, CartSerializer, \
+    OrderItemSerializer
+from datetime import date
 
 
 class LittleLemonPermission(IsAdminUser):
@@ -73,6 +75,7 @@ def update_item(request, pk):
     except Exception as e:
         return Response(e, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
 # 9.	The delivery crew can access orders assigned to them -> GET for Delivery Crew
 # 20.	Customers can place orders -> POST
 # 21.	Customers can browse their own orders -> GET
@@ -80,17 +83,39 @@ def update_item(request, pk):
 @permission_classes([IsAuthenticated])
 def orders_items(request):
     try:
+        user = request.user
         if request.method == 'GET':
-            user = request.user
             if request.user.groups.filter(name='Delivery Crew').exists():
                 order = Order.objects.get(delivery_crew=user)
             else:
                 order = Order.objects.get(user=user)
             serializer = OrderSerializer(order, context={'request': request})
             return Response(serializer.data, status.HTTP_200_OK)
-        elif request.method == 'POST':
 
-            return Response('orders_items')
+        elif request.method == 'POST':
+            cart = Cart.objects.get(user=user)
+            menu_item = cart.menuitem
+            quantity = cart.quantity
+            unit_price = cart.unit_price
+            price = cart.price
+
+            OrderItem.objects.create(
+                order=user,
+                menuitem=menu_item,
+                quantity=quantity,
+                unit_price=unit_price,
+                price=price
+            )
+
+            Order.objects.create(
+                user=user,
+                total=price,
+                date=date.today()
+            )
+            return Response({"message": "Successfully created order!"}, status.HTTP_201_CREATED)
+
+    except ObjectDoesNotExist:
+        return Response({"message": "Data not exist"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
     except Exception as e:
         return Response(e)
 
@@ -193,4 +218,3 @@ def cart_items(request):
 
     except Exception as e:
         return Response(e)
-

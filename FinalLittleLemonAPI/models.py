@@ -38,6 +38,9 @@ class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     delivery_crew = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='delivery_crew', null=True)
 
+    def __str__(self):
+        return f'{self.user} {self.total}'
+
 
 class OrderItem(models.Model):
     quantity = models.SmallIntegerField()
@@ -48,3 +51,6 @@ class OrderItem(models.Model):
 
     class Meta:
         unique_together = ['order', 'menuitem']
+
+    def __str__(self):
+        return f'{self.order} {self.menuitem} {self.price}'

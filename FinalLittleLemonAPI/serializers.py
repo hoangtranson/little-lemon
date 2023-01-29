@@ -38,29 +38,35 @@ class MenuItemSerializer(serializers.ModelSerializer):
 
 
 class OrderSerializer(serializers.ModelSerializer):
-    order_by = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        default=serializers.CurrentUserDefault()
-    )
-    delivery_crew = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        default=serializers.CurrentUserDefault()
-    )
+    # user = serializers.PrimaryKeyRelatedField(
+    #     queryset=User.objects.all(),
+    #     default=serializers.CurrentUserDefault()
+    # )
+    # delivery_crew = serializers.PrimaryKeyRelatedField(
+    #     queryset=User.objects.all(),
+    #     default=serializers.CurrentUserDefault()
+    # )
+
+    user = UserSerializer(read_only=True)
+    delivery_crew = UserSerializer(read_only=True)
 
     class Meta:
         model = Order
-        fields = ['order_by', 'delivery_crew', 'status', 'total', 'date']
+        fields = ['user', 'delivery_crew', 'status', 'total', 'date']
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    order = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        default=serializers.CurrentUserDefault()
-    )
+    # order = serializers.PrimaryKeyRelatedField(
+    #     queryset=User.objects.all(),
+    #     default=serializers.CurrentUserDefault()
+    # )
+    #
+    # menuitem = serializers.PrimaryKeyRelatedField(
+    #     queryset=MenuItem.objects.all()
+    # )
 
-    menuitem = serializers.PrimaryKeyRelatedField(
-        queryset=MenuItem.objects.all()
-    )
+    order = UserSerializer(read_only=True)
+    menuitem = MenuItemSerializer(read_only=True)
 
     class Meta:
         model = OrderItem
