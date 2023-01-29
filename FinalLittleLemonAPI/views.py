@@ -146,8 +146,20 @@ def delivery_crew(request):
 # 8.	Managers can assign orders to the delivery crew
 # 10.	The delivery crew can update an order as delivered
 
-def update_delivery_crew_order(request):
-    return Response('update_delivery_crew_order')
+def update_delivery_crew_order(request, pk):
+
+    try:
+        if request.user.groups.filter(name='Delivery Crew' or 'Manager').exists():
+            order = Order.objects.get(pk=pk)
+
+            serializer = OrderSerializer(order, data=request.data, context={'request': request}, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response({"message": "Successfully updated the order!"}, status.HTTP_201_CREATED)
+            else:
+                return Response({"message": "data not valid"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except Exception as e:
+        return Response(e)
 
 
 # 4.	The admin can add categories
